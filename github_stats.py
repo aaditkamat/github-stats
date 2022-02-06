@@ -78,9 +78,8 @@ class Queries(object):
                 "Authorization": f"token {self.access_token}",
             }
             if params is None:
-                params = dict()
-            if path.startswith("/"):
-                path = path[1:]
+                params = {}
+            path = path.removeprefix("/")
             try:
                 async with self.semaphore:
                     r_async = await self.session.get(
@@ -90,7 +89,7 @@ class Queries(object):
                     )
                 if r_async.status == 202:
                     # print(f"{path} returned 202. Retrying...")
-                    print(f"A path returned 202. Retrying...")
+                    print('A path returned 202. Retrying...')
                     await asyncio.sleep(2)
                     continue
 
@@ -374,7 +373,7 @@ Languages:
 
         # TODO: Improve languages to scale by number of contributions to
         #       specific filetypes
-        langs_total = sum([v.get("size", 0) for v in self._languages.values()])
+        langs_total = sum(v.get("size", 0) for v in self._languages.values())
         for k, v in self._languages.items():
             v["prop"] = 100 * (v.get("size", 0) / langs_total)
 
